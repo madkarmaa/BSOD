@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="BSOD/BSOD.vcxproj" Id="b8c898b8-d00b-4702-9d75-0bf143f4e386" />
+</Solution>
