@@ -24,7 +24,7 @@ jobs:
 
             - name: Build executable
               run: |
-                  msbuild BSOD.sln /p:Configuration=Release /p:Platform=x86
+                  msbuild BSOD.slnx /p:Configuration=Release /p:Platform=x86
 
             - name: Upload artifact
               uses: actions/upload-artifact@v6
