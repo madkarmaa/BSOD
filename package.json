@@ -19,5 +19,5 @@
     "minor": "bun pm version minor && bun run tags",
     "major": "bun pm version major && bun run tags"
   },
-  "version": "1.1.0"
+  "version": "1.1.1"
 }
