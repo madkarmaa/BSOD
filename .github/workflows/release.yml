@@ -1,46 +1,67 @@
 name: Build and Release
 
 on:
-    workflow_dispatch:
-    push:
-        tags:
-            - "v*.*.*"
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
 
 permissions:
-    id-token: write
-    contents: write
+  id-token: write
+  contents: write
 
 jobs:
-    build-and-release:
-        name: Build and Release
-        runs-on: windows-latest
+  build-and-release:
+    name: Build and Release
+    runs-on: windows-latest
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v6
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
 
-            # https://stackoverflow.com/a/79852893
-            - name: Install Visual Studio Build Tools
-              shell: pwsh
-              run: |
-                  choco install visualstudio2026buildtools `
-                  --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended --quiet" `
-                  -y --ignore-package-exit-codes=3010
+      - name: Cache TS dependencies
+        uses: actions/cache@v5
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
 
-            - name: Build executable
-              shell: cmd
-              run: |
-                  call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
-                  msbuild BSOD.slnx /p:Configuration=Release /p:Platform=x86
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-            - name: Upload artifact
-              uses: actions/upload-artifact@v6
-              with:
-                  name: build-executable
-                  path: Release/BSOD.exe
+      - name: Install TS dependencies
+        run: bun i
 
-            - name: Release
-              if: startsWith(github.ref, 'refs/tags/')
-              run: gh release create ${{ github.ref_name }} Release/BSOD.exe --generate-notes
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # https://stackoverflow.com/a/79852893
+      - name: Install Visual Studio Build Tools
+        shell: pwsh
+        run: |
+          choco install visualstudio2026buildtools `
+          --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended --quiet" `
+          -y --ignore-package-exit-codes=3010
+
+      - name: Build executable
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
+          msbuild BSOD.slnx /p:Configuration=Release /p:Platform=x86
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-executable
+          path: Release/BSOD.exe
+
+      - name: VirusTotal Scan
+        id: vt
+        run: bun run scan
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: 'gh release create ${{ github.ref_name }} Release/BSOD.exe --generate-notes --notes "VirusTotal: ${{ steps.vt.outputs.url }}"'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

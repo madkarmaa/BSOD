@@ -1,0 +1,22 @@
+{
+  "name": "bsod",
+  "module": "scripts/virustotal.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "zod": "^4.2.1"
+  },
+  "scripts": {
+    "scan": "bun scripts/virustotal.ts",
+    "tags": "git push origin --tags && git push",
+    "patch": "bun pm version patch && bun run tags",
+    "minor": "bun pm version minor && bun run tags",
+    "major": "bun pm version major && bun run tags"
+  }
+}
