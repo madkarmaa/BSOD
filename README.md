@@ -18,8 +18,8 @@ This application will immediately crash your system. **Do not run on production 
 
 To compile from source:
 
-1. Use Visual Studio with C/C++ development tools
-2. Open `BSOD.slnx` and build the project in **Release** mode
+1. Use [Visual Studio](https://visualstudio.microsoft.com/vs/community/) with C/C++ development tools
+2. Open `BSOD.slnx` and build the project in **Release (x86)** mode
 3. The executable will be generated in the `Release` folder
 
 <small><i>Use at your own risk</i></small>
