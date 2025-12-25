@@ -1,6 +1,6 @@
 # BSOD
 
-A Windows application that triggers a Blue Screen of Death (BSOD) by leveraging native Windows APIs.
+A Windows application that triggers a Blue Screen of Death (BSOD) by leveraging native Windows APIs
 
 ## 📋 Overview
 
