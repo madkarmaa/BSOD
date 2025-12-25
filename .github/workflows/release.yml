@@ -19,14 +19,18 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v6
 
-            - name: Setup MSBuild
-              uses: microsoft/setup-msbuild@v2
-              with:
-                  vs-version: "18,"
-                  vs-prerelease: true
+            # https://stackoverflow.com/a/79852893
+            - name: Install Visual Studio Build Tools
+              shell: pwsh
+              run: |
+                  choco install visualstudio2026buildtools `
+                  --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended --quiet" `
+                  -y --ignore-package-exit-codes=3010
 
             - name: Build executable
+              shell: cmd
               run: |
+                  call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
                   msbuild BSOD.slnx /p:Configuration=Release /p:Platform=x86
 
             - name: Upload artifact
